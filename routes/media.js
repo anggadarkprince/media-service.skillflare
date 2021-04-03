@@ -1,10 +1,26 @@
 const express = require('express');
 const router = express.Router();
 const path = require('path');
+const fs = require('fs');
 const isBase64 = require('is-base64');
 const base64Img = require('base64-img');
 
 const {Media} = require('../models');
+
+router.get('/', async (req, res) => {
+    const media = await Media.findAll();
+
+    return res.json({
+        status: 'success',
+        code: 200,
+        data: media.map(item => {
+            return {
+                ...item.dataValues,
+                url: `${req.protocol}://${req.get('host')}/${item.file}`
+            };
+        })
+    });
+});
 
 router.post('/', (req, res) => {
     const file = req.body.file;
@@ -26,8 +42,6 @@ router.post('/', (req, res) => {
             });
         }
 
-        // '/public/media/file.png'
-        console.log(filepath)
         const fileName = path.basename(filepath);
 
         const media = await Media.create({
@@ -44,6 +58,37 @@ router.post('/', (req, res) => {
             }
         });
     });
+});
+
+router.delete('/:id', async (req, res) => {
+    const media = await Media.findByPk(req.params.id);
+
+    if (!media) {
+        return res.status(404).json({
+            status: 'not found',
+            code: 404,
+            message: 'Media not found'
+        });
+    }
+
+    fs.unlink(`./public/${media.file}`, async (err) => {
+        if (err) {
+            return res.status(500).json({
+                status: 'error',
+                code: 500,
+                message: err.message || 'Cannot delete media'
+            });
+        }
+
+        await media.destroy();
+
+        return res.json({
+            status: 'success',
+            code: 200,
+            data: media
+        });
+    })
+
 });
 
 module.exports = router;
