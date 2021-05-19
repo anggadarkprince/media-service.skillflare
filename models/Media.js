@@ -21,6 +21,7 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: true,
         },
     }, {
-        tableName: 'media'
+        tableName: 'media',
+        timestamps: true
     });
 }

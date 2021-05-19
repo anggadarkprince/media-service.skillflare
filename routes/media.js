@@ -22,6 +22,26 @@ router.get('/', async (req, res) => {
     });
 });
 
+router.get('/:id', async (req, res) => {
+    const id = req.params.id;
+    const media = await Media.findByPk(id);
+
+    if (!media) {
+        return res.status(404).json({
+            status: 'not found',
+            code: 404,
+        });
+    }
+
+    media.dataValues.url = `${req.protocol}://${req.get('host')}/${media.file}`;
+
+    return res.json({
+        status: 'success',
+        code: 200,
+        data: media
+    });
+});
+
 router.post('/', (req, res) => {
     const file = req.body.file;
 
