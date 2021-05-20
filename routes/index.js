@@ -1,9 +1,12 @@
-var express = require('express');
-var router = express.Router();
+const express = require('express');
+const router = express.Router();
 
-/* GET home page. */
 router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
+  return res.status(200).json({
+    app: process.env.APP_NAME || 'Skillflare Media Service',
+    code: 'media-service.skillflare',
+    version: 'v1.0',
+  });
 });
 
 module.exports = router;
