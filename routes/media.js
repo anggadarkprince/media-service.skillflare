@@ -6,6 +6,7 @@ const isBase64 = require('is-base64');
 const base64Img = require('base64-img');
 
 const {Media} = require('../models');
+const {HOSTNAME} = process.env;
 
 router.get('/', async (req, res) => {
     const media = await Media.findAll();
@@ -16,7 +17,7 @@ router.get('/', async (req, res) => {
         data: media.map(item => {
             return {
                 ...item.dataValues,
-                url: `${req.protocol}://${req.get('host')}/${item.file}`
+                url: `${HOSTNAME}/${item.file}`
             };
         })
     });
@@ -33,7 +34,7 @@ router.get('/:id', async (req, res) => {
         });
     }
 
-    media.dataValues.url = `${req.protocol}://${req.get('host')}/${media.file}`;
+    media.dataValues.url = `${HOSTNAME}/${media.file}`;
 
     return res.json({
         status: 'success',
@@ -74,7 +75,7 @@ router.post('/', (req, res) => {
             data: {
                 id: media.id,
                 file: media.file,
-                url: `${req.protocol}://${req.get('host')}/${media.file}`
+                url: `${HOSTNAME}/${media.file}`
             }
         });
     });
